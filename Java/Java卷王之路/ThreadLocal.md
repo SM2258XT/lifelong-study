@@ -1,0 +1,14 @@
+---
+title: ThreadLocal
+updated: 2022-11-10T16:25:29
+created: 2021-09-24T18:11:25
+---
+
+Thread类中有两个变量threadLocals和inheritableThreadLocals，二者都是ThreadLocal内部类ThreadLocalMap类型的变量，我们通过查看内部内ThreadLocalMap可以发现实际上它类似于一个HashMap。
+在默认情况下，每个线程中的这两个变量都为null，只有当线程第一次调用ThreadLocal的set或者get方法的时候才会创建他们。除此之外，和我所想的不同的是，每个线程的本地变量不是存放在ThreadLocal实例中，而是放在调用线程的ThreadLocals变量里面（前面也说过，该变量是Thread类的变量）。
+也就是说，ThreadLocal类型的本地变量是存放在具体的线程空间上，其本身相当于一个装载本地变量的工具壳，通过set方法将value添加到调用线程的threadLocals中，当调用线程调用get方法时候能够从它的threadLocals中取出变量。如果调用线程一直不终止，那么这个本地变量将会一直存放在他的threadLocals中，所以不使用本地变量的时候需要调用remove方法将threadLocals中删除不用的本地变量。
+
+ThreadLocal初始值问题：
+调用get()时，返回为null，因为threadlocal对每个线程的初始值就是null。
+设置初始值：新建一个类继承ThreadLocal，重写initialValue方法，设置返回值即可。之后每个线程调用get时就会返回这个值。
+
